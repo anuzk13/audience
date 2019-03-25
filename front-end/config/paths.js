@@ -76,6 +76,21 @@ const entryPoints = [
     path : resolveModule(resolveApp, 'src/panel'),
     fileName: 'panel.html'
   },
+  {
+    name : 'overlay',
+    path : resolveModule(resolveApp, 'src/overlay'),
+    fileName: 'overlay.html'
+  },
+  {
+    name : 'dashboard',
+    path : resolveModule(resolveApp, 'src/dashboard'),
+    fileName: 'dashboard.html'
+  },
+  {
+    name : 'config',
+    path : resolveModule(resolveApp, 'src/config'),
+    fileName: 'config.html'
+  },
 ]
 // config after eject: we're in ./config/
 module.exports = {

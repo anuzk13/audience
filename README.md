@@ -5,3 +5,8 @@ Proposed folder structure
 Audience
 ├── back-end
 ├── front-end
+    ├──src
+        ├──Panel
+        ├──Overlay
+        ├──Config
+        ├──Dashboard
