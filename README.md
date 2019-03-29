@@ -21,7 +21,7 @@ To run the frontend, `cd front-end` run `HTTPS=true yarn start`
 To run the EBS, `cd back-end`  run `node backend`, with the following command line arguments: `-c <client id>`, `-s <secret>`, `-o <owner id>`.
 
 #### On MacOS
-Navigate to the root of the Hello World extension folder and run `npm install` and then `npm run cert`
+`cd back-end` run `npm install` and then `npm run cert`
 
 #### On Windows
 Run the following commands to generate the necessary certificates for your Hello World backend
