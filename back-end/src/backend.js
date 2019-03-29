@@ -81,7 +81,7 @@ const serverOptions = {
     },
   },
 };
-const serverPathRoot = path.resolve(__dirname, '..', 'conf', 'server');
+const serverPathRoot = path.resolve(__dirname, '../..', 'conf', 'server');
 if (fs.existsSync(serverPathRoot + '.crt') && fs.existsSync(serverPathRoot + '.key')) {
   serverOptions.tls = {
     // If you need a certificate, execute "npm run cert".

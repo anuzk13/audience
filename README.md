@@ -18,7 +18,7 @@ To run the frontend, `cd front-end` run `HTTPS=true yarn start`
 
 ### To run the backend
 
-To run the EBS, `cd back-end`  run `node backend`, with the following command line arguments: `-c <client id>`, `-s <secret>`, `-o <owner id>`.
+To run the EBS, `cd back-end`  run `node src/backend`, with the following command line arguments: `-c <client id>`, `-s <secret>`, `-o <owner id>`.
 
 #### On MacOS
 run `bash bin/generate_cert.sh server` 
