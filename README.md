@@ -18,8 +18,6 @@ To run the frontend, `cd front-end` run `HTTPS=true yarn start`
 
 ### To run the backend
 
-To run the EBS, `cd back-end`  run `node src/backend`, with the following command line arguments: `-c <client id>`, `-s <secret>`, `-o <owner id>`.
-
 #### On MacOS
 run `bash bin/generate_cert.sh server` 
 `cd back-end` run `npm install` 
@@ -27,6 +25,8 @@ run `bash bin/generate_cert.sh server`
 #### On Windows
 run `bin/generate_cert.cmd server` 
 `cd back-end` run `npm install`
+
+To run the EBS, `cd back-end`  run `node src/backend`, with the following command line arguments: `-c <client id>`, `-s <secret>`, `-o <owner id>`.
 
 To get the owner ID, you will need to execute a simple CURL command against the Twitch `/users` endpoint. You'll need your extension client ID as part of the query (this will be made consistent with the Developer Rig shortly, by using _owner name_).
 
