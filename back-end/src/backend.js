@@ -76,9 +76,7 @@ const serverOptions = {
   host: 'localhost',
   port: 8081,
   routes: {
-    cors: {
-      origin: ['*'],
-    },
+    cors: { origin: 'ignore' },
   },
 };
 const serverPathRoot = path.resolve(__dirname, '../..', 'conf', 'server');
@@ -182,12 +180,13 @@ function colorCycleHandler(req) {
 
 function colorQueryHandler(req) {
   // Verify all requests.
-  // const payload = verifyAndDecode(req.headers.authorization);
+  const payload = verifyAndDecode(req.headers.authorization);
 
   // Get the color for the channel from the payload and return it.
-  //const { channel_id: channelId, opaque_user_id: opaqueUserId } = payload;
+  const { channel_id: channelId, opaque_user_id: opaqueUserId } = payload;
   //const currentColor = color(channelColors[channelId] || initialColor).hex();
   //verboseLog(STRINGS.sendColor, currentColor, opaqueUserId);
+  sendColorBroadcast(channelId);
   return 'currentColor';
 }
 
