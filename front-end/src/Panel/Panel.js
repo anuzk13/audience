@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import logo from '../logo.svg';
 import Authentication from '../util/Authentication/Authentication'
 import './Panel.css';
+import Upload from './upload/Upload'
 
 class Panel extends Component {
 
@@ -56,21 +56,10 @@ class Panel extends Component {
     return (
       <div className="Panel">
         <header className="Panel-header">
-          <img src={logo} className="Panel-logo" alt="logo" />
-          <p>
-            Edit <code>src/Panel.js</code> and save to reload.
-          </p>
-          <a
-            className="Panel-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
           <button onClick={this.handleClick}>
             Activate Lasers
           </button>
+          <Upload auth={this.Authentication} />
         </header>
       </div>
     );

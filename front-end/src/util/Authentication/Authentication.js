@@ -86,11 +86,10 @@ export default class Authentication{
      * 
      */
 
-    makeCall(url, method="GET"){
+    makeCall(url, method="GET", body, content_type){
         return new Promise((resolve, reject)=>{
             if(this.isAuthenticated()){
                 let headers={
-                    'Content-Type':'application/json',
                     'Authorization': `Bearer ${this.state.token}`
                 }
     
@@ -98,6 +97,7 @@ export default class Authentication{
                     {
                         method,
                         headers,
+                        body
                     })
                     .then(response=>resolve(response))
                     .catch(e=>reject(e))

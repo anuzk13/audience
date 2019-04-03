@@ -81,13 +81,13 @@ const serverOptions = {
   },
 };
 const serverPathRoot = path.resolve(__dirname, '../..', 'conf', 'server');
-// if (fs.existsSync(serverPathRoot + '.crt') && fs.existsSync(serverPathRoot + '.key')) {
-//   serverOptions.tls = {
-//     // If you need a certificate, execute "npm run cert".
-//     cert: fs.readFileSync(serverPathRoot + '.crt'),
-//     key: fs.readFileSync(serverPathRoot + '.key'),
-//   };
-// }
+if (fs.existsSync(serverPathRoot + '.crt') && fs.existsSync(serverPathRoot + '.key')) {
+  serverOptions.tls = {
+    // If you need a certificate, execute "npm run cert".
+    cert: fs.readFileSync(serverPathRoot + '.crt'),
+    key: fs.readFileSync(serverPathRoot + '.key'),
+  };
+}
 const server = new Hapi.Server(serverOptions);
 
 (async () => {
