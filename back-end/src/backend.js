@@ -162,7 +162,7 @@ function fileHandler(req) {
   const h_payload = verifyAndDecode(req.headers.authorization);
   const { channel_id: channelId, opaque_user_id: opaqueUserId } = h_payload;
   const response = handleFileUpload(payload.file);
-  sendTwitchBroadcast(channelId, payload.file.hapi.filename);
+  attemptTwitchBroadcast(channelId, payload.file.hapi.filename);
   return response;
 }
 
