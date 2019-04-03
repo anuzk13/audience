@@ -15,6 +15,7 @@
  */
 
 const fs = require('fs');
+const Inert = require('inert')
 const Hapi = require('hapi');
 const path = require('path');
 const Boom = require('boom');
@@ -90,6 +91,7 @@ const serverPathRoot = path.resolve(__dirname, '../..', 'conf', 'server');
 const server = new Hapi.Server(serverOptions);
 
 (async () => {
+    await server.register(Inert)
   // Handle a viewer request to cycle the color.
   server.route({
     method: 'POST',
@@ -104,6 +106,18 @@ const server = new Hapi.Server(serverOptions);
     handler: colorQueryHandler,
   });
 
+// get the image file
+  server.route({
+    method: 'GET',
+    path: '/upload/{file*}',
+    handler: {
+      directory: {
+        path: 'upload'
+      }
+    }
+  })
+
+// upload img files
   server.route({
     path: '/upload',
     method: 'POST',
@@ -215,7 +229,7 @@ function handleFileUpload (file) {
       if (err) {
         reject(err)
       }
-      resolve({ message: 'Upload successfully!' })
+      resolve({ message: filename })
     })
   })
  }
