@@ -19,7 +19,6 @@ const Inert = require('inert')
 const Hapi = require('hapi');
 const path = require('path');
 const Boom = require('boom');
-const color = require('color');
 const ext = require('commander');
 const jsonwebtoken = require('jsonwebtoken');
 const request = require('request');
@@ -33,14 +32,11 @@ const verboseLogging = true;
 const verboseLog = verboseLogging ? console.log.bind(console) : () => { };
 
 // Service state variables
-const initialColor = color('#6441A4');      // super important; bleedPurple, etc.
 const serverTokenDurationSec = 30;          // our tokens for pubsub expire after 30 seconds
 const userCooldownMs = 1000;                // maximum input rate per user to prevent bot abuse
 const userCooldownClearIntervalMs = 60000;  // interval to reset our tracking object
 const channelCooldownMs = 1000;             // maximum broadcast rate per channel
 const bearerPrefix = 'Bearer ';             // HTTP authorization headers have this prefix
-const colorWheelRotation = 30;
-const channelColors = {};
 const channelCooldowns = {};                // rate limit compliance
 let userCooldowns = {};                     // spam prevention
 
@@ -54,12 +50,10 @@ const STRINGS = {
   ownerIdMissing: missingValue('owner ID', 'EXT_OWNER_ID'),
   messageSendError: 'Error sending message to channel %s: %s',
   pubsubResponse: 'Message to c:%s returned %s',
-  cyclingColor: 'Cycling color for c:%s on behalf of u:%s',
-  colorBroadcast: 'Broadcasting color %s for c:%s',
-  sendColor: 'Sending color %s to c:%s',
   cooldown: 'Please wait before clicking again',
   invalidAuthHeader: 'Invalid authorization header',
   invalidJwt: 'Invalid JWT',
+  twitchBroadcast: 'Started Twitch Broadcast'
 };
 
 ext.
@@ -91,22 +85,8 @@ if (fs.existsSync(serverPathRoot + '.crt') && fs.existsSync(serverPathRoot + '.k
 const server = new Hapi.Server(serverOptions);
 
 (async () => {
-    await server.register(Inert)
-  // Handle a viewer request to cycle the color.
-  server.route({
-    method: 'POST',
-    path: '/color/cycle',
-    handler: colorCycleHandler,
-  });
-
-  // Handle a new viewer requesting the color.
-  server.route({
-    method: 'GET',
-    path: '/color/query',
-    handler: colorQueryHandler,
-  });
-
-// get the image file
+  await server.register(Inert)
+  // get the image file
   server.route({
     method: 'GET',
     path: '/upload/{file*}',
@@ -117,7 +97,7 @@ const server = new Hapi.Server(serverOptions);
     }
   })
 
-// upload img files
+  // upload img files
   server.route({
     path: '/upload',
     method: 'POST',
@@ -177,47 +157,12 @@ function verifyAndDecode(header) {
   throw Boom.unauthorized(STRINGS.invalidAuthHeader);
 }
 
-function colorCycleHandler(req) {
-  // Verify all requests.
-  const payload = verifyAndDecode(req.headers.authorization);
-  const { channel_id: channelId, opaque_user_id: opaqueUserId } = payload;
-
-  // Store the color for the channel.
-  let currentColor = channelColors[channelId] || initialColor;
-
-  // Bot abuse prevention:  don't allow a user to spam the button.
-  if (userIsInCooldown(opaqueUserId)) {
-    throw Boom.tooManyRequests(STRINGS.cooldown);
-  }
-
-  // Rotate the color as if on a color wheel.
-  verboseLog(STRINGS.cyclingColor, channelId, opaqueUserId);
-  currentColor = color(currentColor).rotate(colorWheelRotation).hex();
-
-  // Save the new color for the channel.
-  channelColors[channelId] = currentColor;
-
-  // Broadcast the color change to all other extension instances on this channel.
-  attemptColorBroadcast(channelId);
-
-  return currentColor;
-}
-
-function colorQueryHandler(req) {
-  // Verify all requests.
-  const payload = verifyAndDecode(req.headers.authorization);
-
-  // Get the color for the channel from the payload and return it.
-  const { channel_id: channelId, opaque_user_id: opaqueUserId } = payload;
-  //const currentColor = color(channelColors[channelId] || initialColor).hex();
-  //verboseLog(STRINGS.sendColor, currentColor, opaqueUserId);
-  sendColorBroadcast(channelId);
-  return 'currentColor';
-}
-
 function fileHandler(req) {
   const { payload } = req
-  const response = handleFileUpload(payload.file)
+  const h_payload = verifyAndDecode(req.headers.authorization);
+  const { channel_id: channelId, opaque_user_id: opaqueUserId } = h_payload;
+  const response = handleFileUpload(payload.file);
+  sendTwitchBroadcast(channelId, payload.file.hapi.filename);
   return response;
 }
 
@@ -234,21 +179,21 @@ function handleFileUpload (file) {
   })
  }
 
-function attemptColorBroadcast(channelId) {
+function attemptTwitchBroadcast(channelId, message) {
   // Check the cool-down to determine if it's okay to send now.
   const now = Date.now();
   const cooldown = channelCooldowns[channelId];
   if (!cooldown || cooldown.time < now) {
     // It is.
-    sendColorBroadcast(channelId);
+    sendTwitchBroadcast(channelId, message);
     channelCooldowns[channelId] = { time: now + channelCooldownMs };
   } else if (!cooldown.trigger) {
     // It isn't; schedule a delayed broadcast if we haven't already done so.
-    cooldown.trigger = setTimeout(sendColorBroadcast, now - cooldown.time, channelId);
+    cooldown.trigger = setTimeout(sendTwitchBroadcast, now - cooldown.time, channelId);
   }
 }
 
-function sendColorBroadcast(channelId) {
+function sendTwitchBroadcast(channelId, message) {
   // Set the HTTP headers required by the Twitch API.
   const headers = {
     'Client-ID': clientId,
@@ -257,15 +202,14 @@ function sendColorBroadcast(channelId) {
   };
 
   // Create the POST body for the Twitch API request.
-  const currentColor = color(channelColors[channelId] || initialColor).hex();
   const body = JSON.stringify({
     content_type: 'application/json',
-    message: currentColor,
+    message,
     targets: ['broadcast'],
   });
 
   // Send the broadcast request to the Twitch API.
-  verboseLog(STRINGS.colorBroadcast, currentColor, channelId);
+  verboseLog(STRINGS.twitchBroadcast, message, channelId);
   request(
     `https://api.twitch.tv/extensions/message/${channelId}`,
     {
