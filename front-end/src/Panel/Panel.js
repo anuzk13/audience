@@ -31,6 +31,7 @@ class Panel extends Component {
             // now that you've got a listener, do something with the result... 
 
             // do something...
+            console.log(`New PubSub message!\n${target}\n${contentType}\n${body}`)
 
         })
 

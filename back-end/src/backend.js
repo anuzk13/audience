@@ -80,13 +80,13 @@ const serverOptions = {
   },
 };
 const serverPathRoot = path.resolve(__dirname, '../..', 'conf', 'server');
-if (fs.existsSync(serverPathRoot + '.crt') && fs.existsSync(serverPathRoot + '.key')) {
-  serverOptions.tls = {
-    // If you need a certificate, execute "npm run cert".
-    cert: fs.readFileSync(serverPathRoot + '.crt'),
-    key: fs.readFileSync(serverPathRoot + '.key'),
-  };
-}
+// if (fs.existsSync(serverPathRoot + '.crt') && fs.existsSync(serverPathRoot + '.key')) {
+//   serverOptions.tls = {
+//     // If you need a certificate, execute "npm run cert".
+//     cert: fs.readFileSync(serverPathRoot + '.crt'),
+//     key: fs.readFileSync(serverPathRoot + '.key'),
+//   };
+// }
 const server = new Hapi.Server(serverOptions);
 
 (async () => {
@@ -103,6 +103,17 @@ const server = new Hapi.Server(serverOptions);
     path: '/color/query',
     handler: colorQueryHandler,
   });
+
+  server.route({
+    path: '/upload',
+    method: 'POST',
+    handler: fileHandler,
+    options: {
+      payload: {
+        output: 'stream',
+      }
+    },
+  })
 
   // Start the server.
   await server.start();
@@ -189,6 +200,25 @@ function colorQueryHandler(req) {
   sendColorBroadcast(channelId);
   return 'currentColor';
 }
+
+function fileHandler(req) {
+  const { payload } = req
+  const response = handleFileUpload(payload.file)
+  return response;
+}
+
+function handleFileUpload (file) {
+  const filename = file.hapi.filename
+  const data = file._data
+  return new Promise((resolve, reject) => {
+    fs.writeFile('./upload/' + filename, data, err => {
+      if (err) {
+        reject(err)
+      }
+      resolve({ message: 'Upload successfully!' })
+    })
+  })
+ }
 
 function attemptColorBroadcast(channelId) {
   // Check the cool-down to determine if it's okay to send now.
