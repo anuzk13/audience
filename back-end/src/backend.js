@@ -109,6 +109,20 @@ const server = new Hapi.Server(serverOptions);
     },
   })
 
+  // return the list of current submissions
+  server.route({
+    path: '/submissions',
+    method: 'GET',
+    handler: submissionHandler
+  })
+
+  // vote for a submission
+  server.route({
+    path: '/vote',
+    method: 'POST',
+    handler: voteHandler
+  })
+
   // Start the server.
   await server.start();
   console.log(STRINGS.serverStarted, server.info.uri);
@@ -162,6 +176,7 @@ function fileHandler(req) {
   const h_payload = verifyAndDecode(req.headers.authorization);
   const { channel_id: channelId, opaque_user_id: opaqueUserId } = h_payload;
   const response = handleFileUpload(payload.file);
+  // TODO: change the message
   attemptTwitchBroadcast(channelId, payload.file.hapi.filename);
   return response;
 }
@@ -174,10 +189,43 @@ function handleFileUpload (file) {
       if (err) {
         reject(err)
       }
+      // TODO: create entity in the databse
       resolve({ message: filename })
     })
   })
  }
+
+function submissionHandler(req) {
+  const { payload } = req
+  const h_payload = verifyAndDecode(req.headers.authorization);
+  // const { channel_id: channelId, user_id: userId } = h_payload;
+  // TODO: retrieve from the database
+  return [
+    {
+      'type' : 'IMG',
+      'src' : 'lol.PNG',
+      'author': 'test_user_id_from_token',
+      'votes': 120,
+      'id': 'submission_id'
+    },
+    {
+      'type' : 'IMG',
+      'src' : 'lol4.PNG',
+      'author': 'test_user_id_from_token_2',
+      'votes': 60,
+      'id': 'submission_id_2'
+    }
+  ]
+}
+
+function voteHandler(req) {
+  const { payload } = req
+  const h_payload = verifyAndDecode(req.headers.authorization);
+  const { channel_id: channelId, user_id: userId } = h_payload;
+  const vote_submission_id = payload.vote_submission_id;
+  // TODO: update in the database
+  // TODO: add message in PubSub with attemptTwitchBroadcast() with the appropiate messagae
+}
 
 function attemptTwitchBroadcast(channelId, message) {
   // Check the cool-down to determine if it's okay to send now.

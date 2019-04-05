@@ -28,11 +28,9 @@ class Panel extends Component {
 
         this.twitch.listen('broadcast',(target,contentType,body)=>{
             this.twitch.rig.log(`New PubSub message!\n${target}\n${contentType}\n${body}`)
-            // now that you've got a listener, do something with the result... 
-
-            // do something...
-            console.log(`New PubSub message!\n${target}\n${contentType}\n${body}`)
-
+            if (body === 'NEW_UPLOADS') {
+              // update the list of submissions 
+            }
         })
 
         this.twitch.onVisibilityChanged((isVisible,_c)=>{

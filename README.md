@@ -39,3 +39,32 @@ To get the owner ID, you will need to execute a simple CURL command against the 
 ```bash
 curl -H "Client-ID: <client id>" -X GET "https://api.twitch.tv/helix/users?login=<owner name>"
 ```
+
+#### Endpoints:
+
+- /submissions @GET
+- input : 
+        - token for user_id, channel_id
+- output:
+        - [
+                {
+                        'type' : '',
+                        'src' : 'url',
+                        'author': id,
+                        'votes': '',
+                        'id': ''
+                }
+        ]
+
+- /vote @POST
+- input :
+        - token for user_id, channel_id
+        - body : {
+                vote_submission_id: int // submission id that the user is voting for
+        }
+- output:
+        - null
+
+#### PubSub codes:
+
+- 'NEW_UPLOADS'
