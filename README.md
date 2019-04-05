@@ -43,9 +43,9 @@ curl -H "Client-ID: <client id>" -X GET "https://api.twitch.tv/helix/users?login
 #### Endpoints:
 
 - /submissions @GET
-- input : 
+    - input : 
         - token for user_id, channel_id
-- output:
+    - output:
         - [
                 {
                         'type' : '',
@@ -57,12 +57,12 @@ curl -H "Client-ID: <client id>" -X GET "https://api.twitch.tv/helix/users?login
         ]
 
 - /vote @POST
-- input :
+    - input :
         - token for user_id, channel_id
-        - body : {
+        - body : ```{
                 vote_submission_id: int // submission id that the user is voting for
-        }
-- output:
+        }```
+    - output:
         - null
 
 #### PubSub codes:
