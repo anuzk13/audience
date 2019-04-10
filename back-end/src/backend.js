@@ -23,6 +23,34 @@ const ext = require('commander');
 const jsonwebtoken = require('jsonwebtoken');
 const request = require('request');
 
+
+// mysql
+// const express = require('express')
+// const app = express()
+// const mysql = require('mysql')
+//
+//
+// app.get('/submissions/:id', (req, res) => {
+//     console.log("fetching user with id: " + req.params.id)
+//     // res.end()
+//
+//     const connection = mysql.createConnection({
+//         host: 'localhost',
+//         user: 'root',
+//         database: 'audience_database'
+//     })
+//
+//     const queryString = "SELECT * FROM submissions WHERE submission_id = ?"
+//     const userId = req.params.id
+//     connection.query(queryString, [userId], (err, rows, fields) => {
+//         console.log("Fetched successfully")
+//         res.send(rows)
+//     })
+// })
+
+
+
+
 // The developer rig uses self-signed certificates.  Node doesn't accept them
 // by default.  Do not use this in production.
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
