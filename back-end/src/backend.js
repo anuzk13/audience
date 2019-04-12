@@ -23,6 +23,7 @@ const ext = require('commander');
 const jsonwebtoken = require('jsonwebtoken');
 const request = require('request');
 const mysql = require('mysql')
+const Q = require('q');
 
 // The developer rig uses self-signed certificates.  Node doesn't accept them
 // by default.  Do not use this in production.
@@ -124,7 +125,9 @@ connection.connect();
   server.route({
     path: '/submissions',
     method: 'GET',
-    handler: submissionHandler
+    handler: async function (request, h) {
+      return submissionHandler(request, h)
+    }
   })
 
   // vote for a submission
@@ -208,18 +211,33 @@ function handleFileUpload (file) {
   })
  }
 
-function submissionHandler(req, h) {
+function executeSQLQuery() {
+  return Q.Promise(function (resolve, reject) {
+    const query = connection.query('SELECT * FROM submissions', (err, result) => {
+        console.log("SQL Transaction query execution -->> ", query.sql, err, result);
+        if (err) {
+            return reject(err)
+        } else {
+            return resolve(result);
+        }
+    });
+  })
+}
+
+async function submissionHandler(req, h) {
   // const { payload } = req
   // const h_payload = verifyAndDecode(req.headers.authorization);
   // const { channel_id: channelId, user_id: userId } = h_payload;
   // TODO: retrieve from the database
-    connection.query('SELECT * FROM submissions',
-      function (error, results, fields) {
-      if (error) throw error;
-        const response = h.response('hello world');
-        response.type('text/plain');
-        return response;
-    });
+    let adminInfo = await executeSQLQuery()
+    return adminInfo;
+    // connection.query('SELECT * FROM submissions',
+    //   function (error, results, fields) {
+    //   if (error) throw error;
+    //     const response = h.response('hello world');
+    //     response.type('text/plain');
+    //     return response;
+    // });
   // return [
   //   {
   //     'type' : 'IMG',
