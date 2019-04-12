@@ -22,33 +22,7 @@ const Boom = require('boom');
 const ext = require('commander');
 const jsonwebtoken = require('jsonwebtoken');
 const request = require('request');
-const express = require('express')
 const mysql = require('mysql')
-
-const app = express()
-
-// app.get('/submissions/:id', (req, res) => {
-//     console.log("fetching user with id: " + req.params.id)
-//     // res.end()
-//
-
-const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    database: 'audience_database'
-})
-
-const queryString = "SELECT * FROM submissions WHERE submission_id = ?"
-const userId = req.params.id
-connection.query(queryString, [userId], (err, rows, fields) => {
-    console.log("Fetched successfully")
-    res.send(rows)
-})
-
-// })
-
-
-
 
 // The developer rig uses self-signed certificates.  Node doesn't accept them
 // by default.  Do not use this in production.
@@ -110,6 +84,16 @@ if (fs.existsSync(serverPathRoot + '.crt') && fs.existsSync(serverPathRoot + '.k
   };
 }
 const server = new Hapi.Server(serverOptions);
+
+ 
+const connection = mysql.createConnection({
+  host: 'localhost',
+  user: 'root',
+  password: 'root',
+  database: 'audience_database'
+});
+
+connection.connect();
 
 (async () => {
   await server.register(Inert)
@@ -224,27 +208,34 @@ function handleFileUpload (file) {
   })
  }
 
-function submissionHandler(req) {
-  const { payload } = req
-  const h_payload = verifyAndDecode(req.headers.authorization);
+function submissionHandler(req, h) {
+  // const { payload } = req
+  // const h_payload = verifyAndDecode(req.headers.authorization);
   // const { channel_id: channelId, user_id: userId } = h_payload;
   // TODO: retrieve from the database
-  return [
-    {
-      'type' : 'IMG',
-      'src' : 'lol.PNG',
-      'author': 'test_user_id_from_token',
-      'votes': 120,
-      'id': 'submission_id'
-    },
-    {
-      'type' : 'IMG',
-      'src' : 'lol4.PNG',
-      'author': 'test_user_id_from_token_2',
-      'votes': 60,
-      'id': 'submission_id_2'
-    }
-  ]
+    connection.query('SELECT * FROM submissions',
+      function (error, results, fields) {
+      if (error) throw error;
+        const response = h.response('hello world');
+        response.type('text/plain');
+        return response;
+    });
+  // return [
+  //   {
+  //     'type' : 'IMG',
+  //     'src' : 'lol.PNG',
+  //     'author': 'test_user_id_from_token',
+  //     'votes': 120,
+  //     'id': 'submission_id'
+  //   },
+  //   {
+  //     'type' : 'IMG',
+  //     'src' : 'lol4.PNG',
+  //     'author': 'test_user_id_from_token_2',
+  //     'votes': 60,
+  //     'id': 'submission_id_2'
+  //   }
+  // ]
 }
 
 function voteHandler(req) {
