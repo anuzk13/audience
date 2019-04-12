@@ -190,7 +190,7 @@ async function fileHandler(req) {
   const response = await handleFileUpload(payload.file).then((pub_message) => {
     return saveSubmission(channelId, userId, pub_message.message)
   });
-  // attemptTwitchBroadcast(channelId, payload.file.hapi.filename);
+  attemptTwitchBroadcast(channelId, payload.file.hapi.filename);
   return response;
 }
 
@@ -202,7 +202,6 @@ function handleFileUpload (file) {
       if (err) {
         reject(err)
       }
-      // TODO: create entity in the databse
       resolve({ message: filename })
     })
   })
