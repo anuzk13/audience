@@ -183,15 +183,14 @@ function verifyAndDecode(header) {
   throw Boom.unauthorized(STRINGS.invalidAuthHeader);
 }
 
-function fileHandler(req) {
+async function fileHandler(req) {
   const { payload } = req
   const h_payload = verifyAndDecode(req.headers.authorization);
-  const { channel_id: channelId, opaque_user_id: opaqueUserId } = h_payload;
-  const response = handleFileUpload(payload.file);
-  // TODO: change the message
-  // const newUploadMessage = 'NEW_UPLOAD'
-  // attemptTwitchBroadcast(channelId, newUploadMessage);
-  attemptTwitchBroadcast(channelId, payload.file.hapi.filename);
+  const { channel_id: channelId, user_id: userId } = h_payload;
+  const response = await handleFileUpload(payload.file).then((pub_message) => {
+    return saveSubmission(channelId, userId, pub_message.message)
+  });
+  // attemptTwitchBroadcast(channelId, payload.file.hapi.filename);
   return response;
 }
 
@@ -208,6 +207,19 @@ function handleFileUpload (file) {
     })
   })
  }
+
+function saveSubmission(channelId, userId, filename) {
+  return Q.Promise(function (resolve, reject) {
+    const q_string = `insert INTO submissions (user_id,url,channel_id) VALUES ('${userId}', '${channelId}', '${filename})'`
+    const query = connection.query(q_string, (err, result) => {
+        if (err) {
+            return resolve([channelId, userId, filename, q_string])
+        } else {
+            return resolve(result);
+        }
+    });
+  })
+}
 
 function getAllSubmissions(channelId) {
   return Q.Promise(function (resolve, reject) {
