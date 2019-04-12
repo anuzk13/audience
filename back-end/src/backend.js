@@ -210,7 +210,7 @@ function handleFileUpload (file) {
 
 function saveSubmission(channelId, userId, filename) {
   return Q.Promise(function (resolve, reject) {
-    const q_string = `insert INTO submissions (user_id,url,channel_id) VALUES ('${userId}', '${channelId}', '${filename})'`
+    const q_string = `insert INTO submissions (user_id,channel_id,url) VALUES ('${userId}', '${channelId}', '${filename}')`
     const query = connection.query(q_string, (err, result) => {
         if (err) {
             return resolve([channelId, userId, filename, q_string])
