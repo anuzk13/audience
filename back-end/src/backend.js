@@ -31,18 +31,19 @@ const app = express()
 //     console.log("fetching user with id: " + req.params.id)
 //     // res.end()
 //
-//     const connection = mysql.createConnection({
-//         host: 'localhost',
-//         user: 'root',
-//         database: 'audience_database'
-//     })
-//
-//     const queryString = "SELECT * FROM submissions WHERE submission_id = ?"
-//     const userId = req.params.id
-//     connection.query(queryString, [userId], (err, rows, fields) => {
-//         console.log("Fetched successfully")
-//         res.send(rows)
-//     })
+
+const connection = mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    database: 'audience_database'
+})
+
+const queryString = "SELECT * FROM submissions WHERE submission_id = ?"
+const userId = req.params.id
+connection.query(queryString, [userId], (err, rows, fields) => {
+    console.log("Fetched successfully")
+    res.send(rows)
+})
 
 // })
 
