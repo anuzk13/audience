@@ -87,13 +87,14 @@ export default class Authentication{
      */
 
     makeCall(url, method="GET", body, content_type){
+        var route = process.env.REACT_APP_API_URL + url;
         return new Promise((resolve, reject)=>{
             if(this.isAuthenticated()){
                 let headers={
                     'Authorization': `Bearer ${this.state.token}`
                 }
     
-                fetch(url,
+                fetch(route,
                     {
                         method,
                         headers,

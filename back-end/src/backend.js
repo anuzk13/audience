@@ -125,9 +125,7 @@ connection.connect();
   server.route({
     path: '/submissions',
     method: 'GET',
-    handler: async function (request, h) {
-      return submissionHandler(request, h)
-    }
+    handler: submissionHandler
   })
 
   // vote for a submission
@@ -211,10 +209,9 @@ function handleFileUpload (file) {
   })
  }
 
-function executeSQLQuery() {
+function getAllSubmissions(channelId) {
   return Q.Promise(function (resolve, reject) {
-    const query = connection.query('SELECT * FROM submissions', (err, result) => {
-        console.log("SQL Transaction query execution -->> ", query.sql, err, result);
+    const query = connection.query('SELECT * FROM submissions WHERE channel_id = "' + channelId + '"', (err, result) => {
         if (err) {
             return reject(err)
         } else {
@@ -225,35 +222,11 @@ function executeSQLQuery() {
 }
 
 async function submissionHandler(req, h) {
-  // const { payload } = req
-  // const h_payload = verifyAndDecode(req.headers.authorization);
-  // const { channel_id: channelId, user_id: userId } = h_payload;
-  // TODO: retrieve from the database
-    let adminInfo = await executeSQLQuery()
-    return adminInfo;
-    // connection.query('SELECT * FROM submissions',
-    //   function (error, results, fields) {
-    //   if (error) throw error;
-    //     const response = h.response('hello world');
-    //     response.type('text/plain');
-    //     return response;
-    // });
-  // return [
-  //   {
-  //     'type' : 'IMG',
-  //     'src' : 'lol.PNG',
-  //     'author': 'test_user_id_from_token',
-  //     'votes': 120,
-  //     'id': 'submission_id'
-  //   },
-  //   {
-  //     'type' : 'IMG',
-  //     'src' : 'lol4.PNG',
-  //     'author': 'test_user_id_from_token_2',
-  //     'votes': 60,
-  //     'id': 'submission_id_2'
-  //   }
-  // ]
+  const { payload } = req
+  const h_payload = verifyAndDecode(req.headers.authorization);
+  const { channel_id: channelId, user_id: userId } = h_payload;
+  let submissions = await getAllSubmissions(channelId)
+  return submissions;
 }
 
 function voteHandler(req) {

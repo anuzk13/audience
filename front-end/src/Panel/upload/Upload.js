@@ -33,7 +33,7 @@ class Upload extends Component {
         formData.append('file', file)
 
         this.props.auth.makeCall(
-            'https://localhost:8081/upload',
+            'upload',
             'POST',
             formData,
             'multipart/form-data').then( a => console.log(a))

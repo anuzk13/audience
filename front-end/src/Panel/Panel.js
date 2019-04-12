@@ -16,7 +16,7 @@ class Panel extends Component {
   }
 
   handleClick() {
-    this.Authentication.makeCall('https://localhost:8081/color/query').then( a => console.log(a))
+    this.Authentication.makeCall('submissions').then( a => console.log(a))
   }
 
   componentDidMount(){
