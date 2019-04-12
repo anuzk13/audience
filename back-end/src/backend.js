@@ -245,6 +245,7 @@ function voteHandler(req) {
   const h_payload = verifyAndDecode(req.headers.authorization);
   const { channel_id: channelId, user_id: userId } = h_payload;
   const vote_submission_id = payload.vote_submission_id;
+  return vote_submission_id;
   // TODO: update in the database
   // TODO: add message in PubSub with attemptTwitchBroadcast() with the appropiate messagae
 }

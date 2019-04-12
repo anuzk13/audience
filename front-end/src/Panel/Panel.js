@@ -13,10 +13,15 @@ class Panel extends Component {
       this.twitch = window.Twitch ? window.Twitch.ext : null
       // This binding is necessary to make `this` work in the callback
       this.handleClick = this.handleClick.bind(this);
+      this.sendVote = this.sendVote.bind(this);
   }
 
   handleClick() {
     this.Authentication.makeCall('submissions').then( a => console.log(a))
+  }
+
+  sendVote() {
+    this.Authentication.makeCallTwo('vote', 'POST', {vote_submission_id:0}).then( a => console.log(a))
   }
 
   componentDidMount(){
@@ -56,6 +61,9 @@ class Panel extends Component {
         <header className="Panel-header">
           <button onClick={this.handleClick}>
             Activate Lasers
+          </button>
+          <button onClick={this.sendVote}>
+            Use your rights!!
           </button>
           <Upload auth={this.Authentication} />
         </header>

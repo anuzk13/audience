@@ -85,6 +85,29 @@ export default class Authentication{
      * Returns a Promise with the Request() object per fetch documentation.
      * 
      */
+    makeCallTwo(url, method="GET", body, content_type){
+        var route = process.env.REACT_APP_API_URL + url;
+        const bod = JSON.stringify(body)
+        return new Promise((resolve, reject)=>{
+            if(this.isAuthenticated()){
+                let headers={
+                    'Content-Type':'application/json',
+                    'Authorization': `Bearer ${this.state.token}`
+                }
+    
+                fetch(route,
+                    {
+                        method,
+                        headers,
+                        body: bod
+                    })
+                    .then(response=>resolve(response))
+                    .catch(e=>reject(e))
+            }else{
+                reject('Unauthorized')
+            }
+        })
+    }
 
     makeCall(url, method="GET", body, content_type){
         var route = process.env.REACT_APP_API_URL + url;
