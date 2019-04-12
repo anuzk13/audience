@@ -22,14 +22,11 @@ const Boom = require('boom');
 const ext = require('commander');
 const jsonwebtoken = require('jsonwebtoken');
 const request = require('request');
+const express = require('express')
+const mysql = require('mysql')
 
+const app = express()
 
-// mysql
-// const express = require('express')
-// const app = express()
-// const mysql = require('mysql')
-//
-//
 // app.get('/submissions/:id', (req, res) => {
 //     console.log("fetching user with id: " + req.params.id)
 //     // res.end()
@@ -205,6 +202,8 @@ function fileHandler(req) {
   const { channel_id: channelId, opaque_user_id: opaqueUserId } = h_payload;
   const response = handleFileUpload(payload.file);
   // TODO: change the message
+  // const newUploadMessage = 'NEW_UPLOAD'
+  // attemptTwitchBroadcast(channelId, newUploadMessage);
   attemptTwitchBroadcast(channelId, payload.file.hapi.filename);
   return response;
 }
