@@ -86,7 +86,7 @@ if (fs.existsSync(serverPathRoot + '.crt') && fs.existsSync(serverPathRoot + '.k
 }
 const server = new Hapi.Server(serverOptions);
 
- 
+
 const connection = mysql.createConnection({
   host: 'localhost',
   user: 'root',
@@ -240,14 +240,34 @@ async function submissionHandler(req, h) {
   return submissions;
 }
 
+// function voteHandler(req) {
+//   const { payload } = req
+//   const h_payload = verifyAndDecode(req.headers.authorization);
+//   const { channel_id: channelId, user_id: userId } = h_payload;
+//   const vote_submission_id = payload.vote_submission_id;
+//   return vote_submission_id;
+//   // TODO: update in the database
+//   // TODO: add message in PubSub with attemptTwitchBroadcast() with the appropiate message
+// }
+
 function voteHandler(req) {
   const { payload } = req
   const h_payload = verifyAndDecode(req.headers.authorization);
   const { channel_id: channelId, user_id: userId } = h_payload;
   const vote_submission_id = payload.vote_submission_id;
+  attemptTwitchBroadcast(channelId, filename);
   return vote_submission_id;
-  // TODO: update in the database
-  // TODO: add message in PubSub with attemptTwitchBroadcast() with the appropiate messagae
+
+function addVote() {
+  return Q.Promise(function (resolve, reject) {
+    const query = connection.query('UPDATE submissions SET votes = votes + 1 WHERE submission_id "' + submission_id + '"', (err, result) => {
+        if (err) {
+            return resolve(err)
+        } else {
+            return resolve(result);
+        }
+    });
+  })
 }
 
 function attemptTwitchBroadcast(channelId, message) {
