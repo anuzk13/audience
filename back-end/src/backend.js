@@ -257,6 +257,7 @@ function voteHandler(req) {
   const vote_submission_id = payload.vote_submission_id;
   attemptTwitchBroadcast(channelId, filename);
   return vote_submission_id;
+}
 
 function addVote() {
   return Q.Promise(function (resolve, reject) {
