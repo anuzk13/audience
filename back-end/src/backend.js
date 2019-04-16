@@ -90,7 +90,7 @@ const server = new Hapi.Server(serverOptions);
 const connection = mysql.createConnection({
   host: 'localhost',
   user: 'root',
-  // password: 'root',
+  password: 'root',
   database: 'audience_database'
 });
 
@@ -190,7 +190,7 @@ async function fileHandler(req) {
   const response = await handleFileUpload(payload.file).then((pub_message) => {
     return saveSubmission(channelId, userId, pub_message.message)
   });
-  attemptTwitchBroadcast(channelId, payload.file.hapi.filename);
+  attemptTwitchBroadcast(channelId, 'NEW_UPLOAD');
   return response;
 }
 
@@ -240,22 +240,13 @@ async function submissionHandler(req, h) {
   return submissions;
 }
 
-// function voteHandler(req) {
-//   const { payload } = req
-//   const h_payload = verifyAndDecode(req.headers.authorization);
-//   const { channel_id: channelId, user_id: userId } = h_payload;
-//   const vote_submission_id = payload.vote_submission_id;
-//   return vote_submission_id;
-//   // TODO: update in the database
-//   // TODO: add message in PubSub with attemptTwitchBroadcast() with the appropiate message
-// }
-
-
-function addVote(channelId) {
+function addVote(submission_id) {
   return Q.Promise(function (resolve, reject) {
-    const query = connection.query('UPDATE submissions SET votes = votes + 1 WHERE submission_id "' + submission_id + '"', (err, result) => {
+    const qry = 'UPDATE submissions SET votes = votes + 1 WHERE submission_id = ' + submission_id
+    connection.query(qry, (err, result) => {
+        console.log(qry)
         if (err) {
-            return resolve(err)
+            return resolve('ERROR')
         } else {
             return resolve(result);
         }
@@ -263,15 +254,14 @@ function addVote(channelId) {
   })
 }
 
-
-function voteHandler(req) {
+async function voteHandler(req) {
   const { payload } = req
   const h_payload = verifyAndDecode(req.headers.authorization);
   const { channel_id: channelId, user_id: userId } = h_payload;
   const vote_submission_id = payload.vote_submission_id;
-  return addVote(channelId)
-  attemptTwitchBroadcast(channelId, filename);
-  return vote_submission_id;
+  let res = await addVote(vote_submission_id)
+  // attemptTwitchBroadcast(channelId, 'NEW_VOTE');
+  return res;
 }
 
 function sortVotes() {
