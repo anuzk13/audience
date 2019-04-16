@@ -90,7 +90,7 @@ const server = new Hapi.Server(serverOptions);
 const connection = mysql.createConnection({
   host: 'localhost',
   user: 'root',
-  password: 'root',
+  // password: 'root',
   database: 'audience_database'
 });
 
@@ -250,16 +250,8 @@ async function submissionHandler(req, h) {
 //   // TODO: add message in PubSub with attemptTwitchBroadcast() with the appropiate message
 // }
 
-function voteHandler(req) {
-  const { payload } = req
-  const h_payload = verifyAndDecode(req.headers.authorization);
-  const { channel_id: channelId, user_id: userId } = h_payload;
-  const vote_submission_id = payload.vote_submission_id;
-  attemptTwitchBroadcast(channelId, filename);
-  return vote_submission_id;
-}
 
-function addVote() {
+function addVote(channelId) {
   return Q.Promise(function (resolve, reject) {
     const query = connection.query('UPDATE submissions SET votes = votes + 1 WHERE submission_id "' + submission_id + '"', (err, result) => {
         if (err) {
@@ -269,6 +261,17 @@ function addVote() {
         }
     });
   })
+}
+
+
+function voteHandler(req) {
+  const { payload } = req
+  const h_payload = verifyAndDecode(req.headers.authorization);
+  const { channel_id: channelId, user_id: userId } = h_payload;
+  const vote_submission_id = payload.vote_submission_id;
+  attemptTwitchBroadcast(channelId, filename);
+  let votes = await addVote(channelId)
+  return vote_submission_id;
 }
 
 function attemptTwitchBroadcast(channelId, message) {
