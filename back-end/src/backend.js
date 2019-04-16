@@ -269,9 +269,21 @@ function voteHandler(req) {
   const h_payload = verifyAndDecode(req.headers.authorization);
   const { channel_id: channelId, user_id: userId } = h_payload;
   const vote_submission_id = payload.vote_submission_id;
+  return addVote(channelId)
   attemptTwitchBroadcast(channelId, filename);
-  let votes = addVote(channelId)
   return vote_submission_id;
+}
+
+function sortVotes() {
+  return Q.Promise(function (resolve, reject) {
+    const query = connection.query('SELECT votes FROM submissions ORDER BY votes DESC', (err, result) => {
+        if (err) {
+            return reject(err)
+        } else {
+            return resolve(result);
+        }
+    });
+  })
 }
 
 function attemptTwitchBroadcast(channelId, message) {
