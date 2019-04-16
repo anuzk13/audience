@@ -5,6 +5,10 @@ import Upload from './upload/Upload'
 
 class Panel extends Component {
 
+  state = {
+    submissions: null,
+  };
+
   constructor(props){
       super(props)
       this.Authentication = new Authentication()
@@ -21,14 +25,17 @@ class Panel extends Component {
   }
 
   sendVote() {
-    this.Authentication.makeCallTwo('vote', 'POST', {vote_submission_id:0}).then( a => console.log(a))
+    this.Authentication.makeCallTwo('vote', 'POST', {vote_submission_id:3}).then( a => console.log(a))
   }
 
   componentDidMount(){
     if(this.twitch){
         this.twitch.onAuthorized((auth)=>{
-            console.log(auth)
             this.Authentication.setToken(auth.token, auth.userId)
+            this.Authentication.makeCall('submissions')
+            .then( response =>  response.json())
+            .then( submissions =>
+              this.setState({submissions}))
         })
 
         this.twitch.listen('broadcast',(target,contentType,body)=>{
@@ -56,19 +63,29 @@ class Panel extends Component {
   }
 
   render() {
-    return (
-      <div className="Panel">
-        <header className="Panel-header">
-          <button onClick={this.handleClick}>
-            Activate Lasers
-          </button>
-          <button onClick={this.sendVote}>
-            Use your rights!!
-          </button>
-          <Upload auth={this.Authentication} />
-        </header>
-      </div>
-    );
+    if (this.state.submissions === null) {
+      return (
+        <div className="Panel">
+          <header className="Panel-header">
+            LOADING ...
+            {/* <Upload auth={this.Authentication} /> */}
+          </header>
+        </div>
+      );
+    } else {
+      let submissions = this.state.submissions.map( s => <div>
+        <img src={`${process.env.REACT_APP_API_URL}upload/${s.url}`}></img>
+      </div>)
+      // let submissions = 'lol'
+      return (
+        <div className="Panel">
+          <header className="Panel-header">
+            {submissions}
+          </header>
+        </div>
+      );
+    }
+    
   }
 }
 
