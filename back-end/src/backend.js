@@ -271,7 +271,7 @@ async function voteHandler(req) {
   const { channel_id: channelId, user_id: userId } = h_payload;
   const vote_submission_id = payload.vote_submission_id;
   let res = await addVote(vote_submission_id)
-  // attemptTwitchBroadcast(channelId, 'NEW_VOTE');
+  attemptTwitchBroadcast(channelId, 'NEW_VOTE');
   return res;
 }
 

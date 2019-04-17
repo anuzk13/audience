@@ -5,6 +5,7 @@ import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import Upload from './upload/Upload';
 
 class Panel extends Component {
 
@@ -28,8 +29,8 @@ class Panel extends Component {
     this.Authentication.makeCall('credentials').then( a => console.log(a))
   }
 
-  sendVote() {
-    this.Authentication.makeCallTwo('vote', 'POST', {vote_submission_id:3}).then( a => console.log(a))
+  sendVote(vote_id) {
+    this.Authentication.makeCallTwo('vote', 'POST', {vote_submission_id:vote_id}).then( a => console.log(a))
   }
 
   componentDidMount(){
@@ -38,17 +39,15 @@ class Panel extends Component {
             this.Authentication.setToken(auth.token, auth.userId)
             this.Authentication.makeCall('submissions')
             .then( response =>  response.json())
-            .then( submissions =>
-              {
-                console.log(submissions);
-                this.setState({submissions})
-              })
+            .then( submissions => this.setState({submissions}))
         })
 
         this.twitch.listen('broadcast',(target,contentType,body)=>{
             this.twitch.rig.log(`New PubSub message!\n${target}\n${contentType}\n${body}`)
-            if (body === 'NEW_UPLOADS') {
-              // update the list of submissions 
+            if (body === 'NEW_UPLOAD' || body === 'NEW_VOTE' ) {
+              this.Authentication.makeCall('submissions')
+              .then( response =>  response.json())
+              .then( submissions =>this.setState({submissions}))
             }
         })
 
@@ -81,14 +80,16 @@ class Panel extends Component {
       );
     } else {
       let submissions = this.state.submissions.map( s => 
-        <Col xs={6} className="submission" key={s.url}>
+        <Col xs={6} className="submission" key={s.submission_id}>
           <img src={`${process.env.REACT_APP_API_URL}upload/${s.url}`}></img>
-          <Button onClick={this.handleClick}> Vote </Button>
+          <p> Votes: {s.votes}</p>
+          <Button onClick={() => this.sendVote(s.submission_id)}> Vote </Button>
         </Col>)
       // let submissions = 'lol'
       return (
         <div className="Panel">
           <header className="Panel-header">
+          <Upload auth={this.Authentication} />
           <Container>
             <Row>
               {submissions}
