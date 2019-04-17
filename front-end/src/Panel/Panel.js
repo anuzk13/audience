@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
 import Authentication from '../util/Authentication/Authentication'
 import './Panel.css';
-import Upload from './upload/Upload'
+import Button from 'react-bootstrap/Button';
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 
 class Panel extends Component {
 
@@ -18,10 +21,11 @@ class Panel extends Component {
       // This binding is necessary to make `this` work in the callback
       this.handleClick = this.handleClick.bind(this);
       this.sendVote = this.sendVote.bind(this);
+      this.handleClick = this.handleClick.bind(this);
   }
 
   handleClick() {
-    this.Authentication.makeCall('submissions').then( a => console.log(a))
+    this.Authentication.makeCall('credentials').then( a => console.log(a))
   }
 
   sendVote() {
@@ -35,7 +39,10 @@ class Panel extends Component {
             this.Authentication.makeCall('submissions')
             .then( response =>  response.json())
             .then( submissions =>
-              this.setState({submissions}))
+              {
+                console.log(submissions);
+                this.setState({submissions})
+              })
         })
 
         this.twitch.listen('broadcast',(target,contentType,body)=>{
@@ -73,14 +80,20 @@ class Panel extends Component {
         </div>
       );
     } else {
-      let submissions = this.state.submissions.map( s => <div>
-        <img src={`${process.env.REACT_APP_API_URL}upload/${s.url}`}></img>
-      </div>)
+      let submissions = this.state.submissions.map( s => 
+        <Col xs={6} className="submission" key={s.url}>
+          <img src={`${process.env.REACT_APP_API_URL}upload/${s.url}`}></img>
+          <Button onClick={this.handleClick}> Vote </Button>
+        </Col>)
       // let submissions = 'lol'
       return (
         <div className="Panel">
           <header className="Panel-header">
-            {submissions}
+          <Container>
+            <Row>
+              {submissions}
+            </Row>
+          </Container>
           </header>
         </div>
       );

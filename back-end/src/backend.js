@@ -128,6 +128,17 @@ connection.connect();
     handler: submissionHandler
   })
 
+   // return the credentials of the user
+   server.route({
+    path: '/credentials',
+    method: 'GET',
+    handler: (req, h) => {
+      const { payload } = req
+      const h_payload = verifyAndDecode(req.headers.authorization);
+      return h_payload;
+    }
+  })
+
   // vote for a submission
   server.route({
     path: '/vote',
