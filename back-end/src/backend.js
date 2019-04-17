@@ -128,6 +128,13 @@ connection.connect();
     handler: submissionHandler
   })
 
+  // return the list of current submissions
+  server.route({
+    path: '/submissions_sorted',
+    method: 'GET',
+    handler: submissionSortedHandler
+  })
+  
    // return the credentials of the user
    server.route({
     path: '/credentials',
@@ -243,11 +250,33 @@ function getAllSubmissions(channelId) {
   })
 }
 
+
+function sortVotes(channelId) {
+  return Q.Promise(function (resolve, reject) {
+    const query = connection.query('SELECT * FROM audience_database.submissions WHERE channel_id = "' + channelId + '" ORDER BY votes DESC', (err, result) => {
+        if (err) {
+            return reject(err)
+        } else {
+            return resolve(result);
+        }
+    });
+  })
+}
+
+
 async function submissionHandler(req, h) {
   const { payload } = req
   const h_payload = verifyAndDecode(req.headers.authorization);
   const { channel_id: channelId, user_id: userId } = h_payload;
   let submissions = await getAllSubmissions(channelId)
+  return submissions;
+}
+
+async function submissionSortedHandler(req, h) {
+  const { payload } = req
+  const h_payload = verifyAndDecode(req.headers.authorization);
+  const { channel_id: channelId, user_id: userId } = h_payload;
+  let submissions = await sortVotes(channelId)
   return submissions;
 }
 
@@ -273,18 +302,6 @@ async function voteHandler(req) {
   let res = await addVote(vote_submission_id)
   attemptTwitchBroadcast(channelId, 'NEW_VOTE');
   return res;
-}
-
-function sortVotes() {
-  return Q.Promise(function (resolve, reject) {
-    const query = connection.query('SELECT votes FROM submissions ORDER BY votes DESC', (err, result) => {
-        if (err) {
-            return reject(err)
-        } else {
-            return resolve(result);
-        }
-    });
-  })
 }
 
 function attemptTwitchBroadcast(channelId, message) {
