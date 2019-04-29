@@ -6,23 +6,23 @@ Base Folder for the Audience extensions
 
 Audience
 
-├── back-end
+    ├── back-end
 
-├── front-end
+    ├── front-end
 
-    ├──src
-    
-        ├──Panel
-        
-        ├──Overlay
-        
-        ├──Config
-        
-        ├──Dashboard
-        
-├── bin
+        ├──src
 
-├── conf
+            ├──Panel
+
+            ├──Overlay
+
+            ├──Config
+
+            ├──Dashboard
+
+    ├── bin
+
+    ├── conf
 
 ### Generate certificates
 To run a secure server with node and webpack you must use this commands to create certificates under /conf
