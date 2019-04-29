@@ -1,6 +1,8 @@
-Base Folder for the Audience extensions
+You can see a demo of the extension here:
 
-### Proposed folder structure 
+https://youtu.be/FDwTSgEnGRE
+
+Base Folder for the Audience extensions
 
 Audience
 
