@@ -3,14 +3,33 @@ Base Folder for the Audience extensions
 ### Proposed folder structure 
 
 Audience
-├── back-end
-├── front-end
-    ├──src
-        ├──Panel
-        ├──Overlay
-        ├──Config
-        ├──Dashboard
 
+├── back-end
+
+├── front-end
+
+    ├──src
+    
+        ├──Panel
+        
+        ├──Overlay
+        
+        ├──Config
+        
+        ├──Dashboard
+        
+├── bin
+
+├── conf
+
+### Generate certificates
+To run a secure server with node and webpack you must use this commands to create certificates under /conf
+
+#### On Windows
+run `bin/generate_cert.cmd server` 
+
+#### On MacOS
+run `bash bin/generate_cert.sh server` 
 
 ### To run the frontend
 
@@ -23,13 +42,8 @@ To run the frontend, `cd front-end` run `HTTPS=true yarn start`
 ### To run the backend
 
 #### Install dependencies
-#### On MacOS
-run `bash bin/generate_cert.sh server` 
-`cd back-end` run `npm install` 
 
-#### On Windows
-run `bin/generate_cert.cmd server` 
-`cd back-end` run `npm install`
+`cd back-end` run `npm install` 
 
 #### Run
 To run the EBS, `cd back-end`  run `node src/backend`, with the following command line arguments: `-c <client id>`, `-s <secret>`, `-o <owner id>`.
@@ -64,7 +78,3 @@ curl -H "Client-ID: <client id>" -X GET "https://api.twitch.tv/helix/users?login
         }```
     - output:
         - null
-
-#### PubSub codes:
-
-- 'NEW_UPLOADS'
